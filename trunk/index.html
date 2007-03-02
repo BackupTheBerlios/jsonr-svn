@@ -1,0 +1,379 @@
+<html><!-- Copyright (C) 2007 Laurent A.V. Szyster - Copylef GPL 2.0 -->
+<head>
+  <title>JSONR</title>
+  <style type="text/css">
+  body > div {
+    margin: auto; width: 640px;
+    }
+  input {
+    font-family: 'Courier New'; 
+    font-size: 10pt;
+    }
+  .hidden {display: none;}
+  #footer {
+    color: grey;
+    font-size: small; 
+    text-align: center;
+    }
+  pre {background-color: #EEEEEE; padding: 4pt;}
+  table {width: 640px; border: 1px solid #999999;}
+  td {padding: 2px;}
+  td:first-child {background-color: #EEEEEE;}
+  a {color: #3333FF;text-decoration: none;}
+  a:visited {color: #000099;}
+  a:hover {color: #3333FF;}
+  a:active {color: #6666FF;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="main" style="{margin: auto; width: 640px;}">  
+<img src="jsonr.png" alt="JSONR" align="right" />
+<h1><a href="/">JSONR</a></h1>
+<em>Regular JavaScript Object Notation</em>
+<h2>Applications</h2>
+<p>
+  Regular JSON (or JSONR) is a simple protocol to specify practical patterns
+  for network object models.
+</p>
+<p>
+  JSONR can be applied in a web browser to <a 
+  href="jsonr.html"
+  >generate interactive HTML</a> input forms from an object model instead 
+  of an an-hoc program. In a web controller JSONR is usefull to validate 
+  network input against the application's model instead of an ad-hoc program.
+</p>
+<p>
+  Reference implementations are available for both use case respectively
+  in JavaScript (<code><a 
+  href="jsonr.js"
+  >jsonr.js</a></code>) and Java (<code>org.<a 
+  href="/less4j/">less4j</a>.<a 
+  href="http://svn.berlios.de/svnroot/repos/less4j/trunk/org/less4j/JSONR.java"
+  >JSONR</a></code>).
+</p>
+<h2>Specification</h2>
+<p>
+  JSONR is a simple application of <a href="http://www.json.org/">JSON</a> 
+  to express patterns of the most common object models for programming 
+  languages: null, true or false, integer, double and decimal, irregular and 
+  regular strings, numeric ranges around and from zero, collections, 
+  relations, dictionnaries and namespaces.
+</p>
+<p>
+  By design, JSONR patterns are constrained to relevance, forced to describe
+  object models with only optional nested scopes, where <code>null</code> is 
+  the only valid expression for the absence of data and for which irregular 
+  strings are allways optional.
+</p>
+<h3>Duck typing</h3>
+<p>
+  If it quaks like a duck and walks like a duck then it <em>must</em> be 
+  a duck:
+</p>
+<table>
+  <tr>
+    <td><code>null</code></td>
+    <td>any value</td>
+  </tr>
+  <tr>
+    <td><code>true</code></td>
+    <td>a boolean, true by default</td>
+  </tr>
+  <tr>
+    <td><code>false</code></td>
+    <td>also a boolean, false by default</td>
+  </tr>
+  <tr>
+    <td><code>""</code></td>
+    <td>any text string</td>
+  </tr>
+  <tr>
+    <td><code>0</code></td>
+    <td>any number</td>
+  </tr>
+</table>
+<p>
+  JSONR implementation <em>may</em> infer numeric application types from 
+  formats: if it prints like an integer, a double or a decimal, then
+  it is an integer, a double or a decimal.
+</p>  
+<table>
+  <tr>
+    <td><code>0</code></td>
+    <td>an integer value</td>
+  </tr>
+  <tr>
+    <td><code>0e+</code></td>
+    <td>a double value</td>
+  </tr>
+  <tr>
+    <td><code>0.0</code></td>
+    <td>a decimal value</td>
+  </tr>
+</table>
+<p>
+  However, most JSON implementation - most notably JavaScript - support 
+  only one numeric type and can therefore not distinguish between the 
+  different formats of zero.
+</p>
+<h3>Numeric Ranges</h3>
+<p>
+  JSONR agents <em>must</em> interpret numeric values different than zero a 
+  simple numeric ranges between zero and <code>N</code> if <code>N</code> is 
+  positive or between <code>N</code> and <code>-N</code> if <code>N</code> 
+  is negative. 
+</p>
+<p>
+  They also <em>may</em> distinguish numeric types and <em>must</em> 
+  differentiate integer and float or decimal ranges from the absence of
+  decimal fractions.
+</p>
+<p>
+  For instance:
+</p>  
+<table>
+  <tr>
+    <td><code>12</code></td>
+    <td>a non-negative integer lower than or equal 12</td>
+  </tr>
+  <tr>
+    <td><code>50e-2</code></td>
+    <td>a non-negative double value lower than or equal 0.50</td>
+  </tr>
+  <tr>
+    <td><code>10.01</code></td>
+    <td>any two digit decimal between 0.00 and 10.00</td>
+  </tr>
+  <tr>
+    <td><code>-1000</code></td>
+    <td>an integer between -1000 and 1000</td>
+  </tr>
+  <tr>
+    <td><code>-50e-2</code></td>
+    <td>any double between -0.50 and +0.50</td>
+  </tr>
+  <tr>
+    <td><code>-10.01</code></td>
+    <td>a two digit decimal between -10.00 and +10.00</td>
+  </tr>
+</table>
+<p>
+  Functional numeric constraints that are not positive maximums or absolute 
+  ranges belong to the application process and are usually best expressed in 
+  the application's own programming language.
+</p>
+<h3>Named Patterns</h3>
+<p>
+  Some application demand specialized data types, usually defined by network
+  protocols and computer programs as extension of the string type. JSONR
+  provides an opportunity for extensions: string values that match the name 
+  of a protocol extension <em>must</em> be interpreted likewise.
+</p>
+<p>
+  JSONR agents <em>should</em> implement two named patterns: the common
+  JavaScript <code>datetime</code> format and the new <a 
+    href="/publicnames/index.html"
+  >Public Names</a> protocol for meaningfull resource identifiers.
+</p>
+<table>
+  <tr>
+   <td><code>"yyyy-MM-ddTHH:mm:ss"</code></td>
+   <td>
+     a valid date and type value formated alike, as the defacto standard
+     JavaScript 1.7 serialization of a date and time instance.
+   </td>
+  </tr>
+  <tr>
+   <td><code>"6:Names,5:Public,"</code></td>
+   <td>
+     a valid Public Names, a simple protocol to name network resources in a 
+     meaningfull way for human and a practical way for computer applications.
+   </td>
+  </tr>
+</table>
+<p>
+  Note that JSONR agents <em>must not</em> use those two names for anything 
+  else than JavaScript datetime and Public Names.
+</p>
+<h3>Regular String</h3>  
+<p>
+  JSONR interprets non-empty string as either the name of an extension type
+  or a <a href="http://www.pcre.org/">Perl regular expression</a>.
+</p>  
+<p>
+  For instance:
+</p>
+<table>
+  <tr>
+    <td><code>"^..........$"</code></td>
+    <td>
+      exactly ten UNICODE characters
+    </td>
+  </tr>
+  <tr>
+    <td><code>"^[A-Z0-9]*$"</code></td>
+    <td>
+      a string of zero or more uppercase roman alphanumerics
+    </td>
+  </tr>
+  <tr>
+    <td><code>"[\\x20-\\x7E]+"</code></td>
+    <td>
+      any string made of at least one printable 7-bit ASCII character
+    </td>
+  </tr>
+</table>
+<p>
+  Perl regular expressions are enough to define practical limits on most 
+  network application object model strings and are available on virtually
+  all development plateform.
+</p>
+<h3>Collections</h3>  
+<p>
+  An array with one element <em>must</em> be interpreted by JSONR applications 
+  as either <code>null</code> or a collection of one or more of its single 
+  regular value:
+</p>  
+<table>
+  <tr>
+   <td><code>[null]</code></td>
+   <td>one or more values of any type</td>
+  </tr>
+  <tr>
+   <td><code>[12]</code></td>
+   <td>a list of at least one integer between 1 and 12</td>
+  </tr>
+  <tr>
+   <td><code>[-10.01]</code></td>
+   <td>one or more two digit decimal between -10.00 and +10.00</td>
+  </tr>
+  <tr><td><code>[1.0e-1]</code></td>
+   <td>an non-empty collection of doubles between 0 and 0.1</td>
+  </tr>
+  <tr>
+   <td><code>[""]</code></td>
+   <td>a list of at least one irregular strings</td>
+  </tr>
+  <tr>
+   <td><code>["[a-z]*"]</code></td>
+   <td>one or more strings matching this regular expression</td>
+  </tr>
+</table>
+<p>
+  Note that <code>[]</code> is <em>not</em> a valid JSONR pattern.
+</p>  
+<h3>Relations</h3>  
+<p>
+  An array with more than one element <em>must</em> interpreted as a regular 
+  relation, an ordered set of more than one JSONR expression. For instance,
+</p>  
+<pre>[".+", 800, 600, true]</pre>
+<p>
+  defines an ordered relation between: a non-empty string, an integer between
+  0 and 800, an integer between 0 and 600 and a boolean.
+</p>
+<p>
+  Combining collection and relation JSONR can define the most common 
+  relational model of tables.
+</p>
+<p>
+  For instance:
+</p>
+<pre>[[".+", 800, 600, true]]</pre>
+<p>
+  validates the data following data:
+</p>
+<pre>[
+   ["A", 270, 420, true],
+   ["B", 24, 24, true],
+   ["C", 768, 240, true],
+   ["D", 799, 599, false]
+   ]</pre>
+<p>
+  Note that this makes JSONR a practical modeling language for network
+  database applications.
+</p>  
+<h3>Dictionnary</h3>  
+<p>
+  An object with a single property <em>must</em> be interpreted as a 
+  dictionnary of regular key strings and values.
+</p>
+<p>
+  For instance:
+</p>
+<pre>{"[a-zA-Z]{4,35}": "yyyy-MM-ddTHH:mm:ss"}</pre>
+<p>
+  is the model for a mapping of short cased alphabetic names to JavaScript
+  dates and times.
+</p>
+<p>
+  Note how JSONR simplicity prevents the definition of irrelevant namespaces
+  made of only one name: an object with a single property would be a redundant 
+  data structure, so such singleton must be interpreted differently.
+</p>
+<h3>Namespaces</h3>  
+<p>
+  JSONR agents <em>must</em> interpret all nulls, arrays, objects and 
+  irregular strings as optional in their namespace. All other named properties 
+  <em>must</em> be present in a matching object and names not present 
+  in a JSONR model are invalid.
+</p>
+<p>For instance, in this namespace:</p>
+<pre>{
+  "publicNames": "5:Names,6:Public,", 
+  "title": ".+",
+  "firstName": ".+",
+  "middleName": ".+",
+  "lastName": ".+",
+  "online": false,
+  "mailto": "[\\x20-\\x7E]+@[\\x20-\\x7E]+",
+  "href": "https?:\\/\\/.+(\\/.+)?",
+  "contactPersons": ["5:Names,6:Public,"],
+  "courses": [["[a-zA-Z]{4,35}", 52, 7, 8]],
+  "vcard": "",
+  "extensions": {".+$": null}
+  }</pre>
+<p>
+  the properties <code>contactPersons</code>, <code>courses</code>,
+  <code>vcard</code> and <code>extensions</code> are optional.
+</p>
+<p>
+  The protocol is specifically intended to favour flat, unambiguous and 
+  practically possible models everywhere JSON is available (virtually 
+  everywhere). Deeply nested and ambiguous models are still possible, but 
+  their applications will require more boilerplate code to manage data and 
+  structure.
+</p>
+<p>
+  To enable simple application extensions, JSONR implementation <em>must</em> 
+  add all names declared to the map of named patterns maintained for the
+  model interpreted.
+</p>  
+<p>
+  For instance:
+</p>
+<pre>{
+  "point": {"x": 0e+1, "y": 0e+1, "z": 0e+1}, 
+  "directions": [{"a": "point", "b": "point"}]
+  }</pre>
+<p>
+  is a valid expression to declare the <code>point</code> model and then
+  use it to model a collection of directions.
+</p>
+<p>
+  Finally, note that <code>{}</code> is <em>not</em> a valid JSONR pattern.
+</p>
+</div>
+<div id="footer"
+  >Copyright &copy; 2006-2007 Laurent A.V. Szyster</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-494233-3";
+urchinTracker();
+</script>
+</body>
+</html>

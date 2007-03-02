@@ -1,0 +1,28 @@
+div#main {
+	margin: auto; 
+	width: 640px;
+}
+input {
+	font-family: "Courier New";
+	font-size: 10pt;
+}
+td {
+	vertical-align: top;
+	font-family: "Arial";
+	font-size: 10pt;
+}
+#jsonrView {
+    padding: 4px;
+	border: 1px solid #CCCCCC;
+}
+.jsonrError {
+	background-color: #FFDDEE;
+}
+#jsonrModelError {
+	font-family: "Courier New";
+	color: Crimson;
+}
+#jsonrObjectError {
+	font-family: "Courier New";
+	color: Crimson;
+}
