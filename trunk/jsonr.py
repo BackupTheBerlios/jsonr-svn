@@ -21,7 +21,7 @@ class Error (Exception): pass
 
 def _null (instance): return instance
 
-def compile (pattern):
+def compile (pattern, named):
         if pattern == None:
                 return _null
         
@@ -33,7 +33,10 @@ def compile (pattern):
                 if len (pattern) == 0:
                         return unicode
                 
-                else:
+                try:
+                        return named[pattern]
+                
+                except:
                         pattern = re.compile (pattern)
                         def _regular (instance):
                                 if (pattern.match (
@@ -131,14 +134,14 @@ def compile (pattern):
                 
         elif t == list:
                 if len (pattern) == 1:
-                        t = compile (pattern[0])
+                        t = compile (pattern[0], named)
                         def _collection (instance): 
                                 return [t (i) for i in instance]
                         
                         return _collection
                 
                 elif len (pattern) > 1:
-                        t = [compile (p) for p in pattern]
+                        t = [compile (p, named) for p in pattern]
                         T = range (len (types))
                         def _relation (instance):
                                 return [t[i] (instance[i]) for i in T]
@@ -152,7 +155,7 @@ def compile (pattern):
                 items = pattern.items ()
                 if len (items) == 1:
                         match = re.compile (items[0]).match
-                        t = compile (items[1])
+                        t = compile (items[1], named)
                         def _dictionary (instance):
                                 return dict ((
                                         (k, t (v)) 
@@ -165,7 +168,9 @@ def compile (pattern):
                         return _dictionary
                 
                 elif len (items) > 1:
-                        ns = dict (((k, compile (v)) for k, v in items))
+                        ns = {}
+                        for k, v in items:
+                                named[k] = ns[k] = compile (v, named)
                         mandatory = set ((k for k, v in items if not (
                                 v == u"" or type (v) in (list, dict)
                                 )))
