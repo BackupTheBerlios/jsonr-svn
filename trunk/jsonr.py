@@ -97,7 +97,7 @@ def compile (pattern):
                         return _floatAbsolute
                 
         elif t == Decimal: 
-                if pattern == _zero:
+                if pattern == 0:
                         def _decimal (instance):
                                 return Decimal (
                                         str (instance)
