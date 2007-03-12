@@ -175,20 +175,16 @@ def compile (pattern, named):
                                 v == u"" or type (v) in (list, dict)
                                 )))
                         def _namespace (instance):
-                                d = dict ((
-                                        (k, ns[k] (v)) 
-                                        for k, v in instance.items ()
-                                        if (
-                                                type (k) == unicode and 
-                                                match (k) != None
-                                                )
-                                        ))
                                 keys = set (instance.keys ())
                                 if mandatory.issubset (keys):
-                                        return d
+                                        return dict ((
+                                                (k, ns[k] (v)) 
+                                                for k, v in instance.items ()
+                                                if ns.has_key (k)
+                                                ))
                                 
                                 raise Error ("mandatory: " + ','.join (
-                                        ns.difference (keys)
+                                        mandatory.difference (keys)
                                         ))
                         
                         return _namespace
