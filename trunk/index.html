@@ -44,13 +44,15 @@
   network input against the application's model instead of an ad-hoc program.
 </p>
 <p>
-  Reference implementations are available for both use case respectively
+  Implementations are available for both use case respectively
   in JavaScript (<code><a 
   href="jsonr.js"
-  >jsonr.js</a></code>) and Java (<code>org.<a 
+  >jsonr.js</a></code>), Java (<code>org.<a 
   href="/less4j/">less4j</a>.<a 
   href="http://svn.berlios.de/svnroot/repos/less4j/trunk/org/less4j/JSONR.java"
-  >JSONR</a></code>).
+  >JSONR</a></code>) and Python (<code><a 
+  href="jsonr.py"
+  >jsonr.py</a></code>). 
 </p>
 <h2>Specification</h2>
 <p>
@@ -95,8 +97,8 @@
 </table>
 <p>
   JSONR implementation <em>may</em> infer numeric application types from 
-  formats: if it prints like an integer, a double or a decimal, then
-  it is an integer, a double or a decimal.
+  formats as follow: if it prints like an zero integer, double or decimal, 
+  then it is an integer, a double or a decimal.
 </p>  
 <table>
   <tr>
@@ -113,41 +115,41 @@
   </tr>
 </table>
 <p>
-  However, most JSON implementation - most notably JavaScript - support 
-  only one numeric type and can therefore not distinguish between the 
-  different formats of zero.
+  Most JSON implementation - most notably JavaScript - support only one 
+  numeric type and can therefore not distinguish between the different 
+  formats of zero.
 </p>
 <h3>Numeric Ranges</h3>
 <p>
   JSONR agents <em>must</em> interpret numeric values different than zero a 
   simple numeric ranges between zero and <code>N</code> if <code>N</code> is 
   positive or between <code>N</code> and <code>-N</code> if <code>N</code> 
-  is negative. 
+  is negative.
 </p>
-<p>
-  They also <em>may</em> distinguish numeric types and <em>must</em> 
-  differentiate integer and float or decimal ranges from the absence of
-  decimal fractions.
-</p>
-<p>
-  For instance:
-</p>  
 <table>
   <tr>
     <td><code>12</code></td>
     <td>a non-negative integer lower than or equal 12</td>
   </tr>
   <tr>
+    <td><code>-100</code></td>
+    <td>an integer between -100 and 100</td>
+  </tr>
+</table>
+<p>
+  They also <em>may</em> distinguish numeric types. In this case they 
+  <em>must</em> differentiate integer and float or decimal ranges from 
+  the absence of decimal fractions. Also, decimal ranges <em>must</em> 
+  be interpreted as strictly between zero and N:
+</p>
+<table>
+  <tr>
     <td><code>50e-2</code></td>
     <td>a non-negative double value lower than or equal 0.50</td>
   </tr>
   <tr>
     <td><code>10.01</code></td>
-    <td>any two digit decimal between 0.00 and 10.00</td>
-  </tr>
-  <tr>
-    <td><code>-1000</code></td>
-    <td>an integer between -1000 and 1000</td>
+    <td>any two digit decimal between 0.01 and 10.00</td>
   </tr>
   <tr>
     <td><code>-50e-2</code></td>
@@ -159,8 +161,8 @@
   </tr>
 </table>
 <p>
-  Functional numeric constraints that are not positive maximums or absolute 
-  ranges belong to the application process and are usually best expressed in 
+  Functional numeric constraints that are not positive or absolute ranges 
+  belong to the application process and are usually best expressed in 
   the application's own programming language.
 </p>
 <h3>Named Patterns</h3>
@@ -168,7 +170,7 @@
   Some application demand specialized data types, usually defined by network
   protocols and computer programs as extension of the string type. JSONR
   provides an opportunity for extensions: string values that match the name 
-  of a protocol extension <em>must</em> be interpreted likewise.
+  of a protocol extension <em>should</em> be interpreted likewise.
 </p>
 <p>
   JSONR agents <em>should</em> implement two named patterns: the common
@@ -181,7 +183,7 @@
    <td><code>"yyyy-MM-ddTHH:mm:ss"</code></td>
    <td>
      a valid date and type value formated alike, as the defacto standard
-     JavaScript 1.7 serialization of a date and time instance.
+     serialization of a date and time instance.
    </td>
   </tr>
   <tr>
